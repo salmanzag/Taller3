@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".register_activity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="16dp"
+        tools:layout_editor_absoluteX="128dp"
+        tools:layout_editor_absoluteY="45dp">
+
+        <ImageView
+            android:id="@+id/imgPerfil"
+            android:layout_width="110dp"
+            android:layout_height="110dp"/>
+            <!--> Poner la foto de perfil<-->
+
+        <Button
+            android:id="@+id/buttonElegirImagen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Seleccionar imagen"
+            android:backgroundTint="#FF5722"
+            tools:layout_editor_absoluteX="160dp"
+            tools:layout_editor_absoluteY="390dp"/>
+
+
+        <EditText
+            android:id="@+id/etNombreUsuario"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nombre" />
+
+        <EditText
+            android:id="@+id/etApellidoUsuario"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Apellido" />
+
+        <EditText
+            android:id="@+id/etCorreoUsuario"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Correo electronico" />
+
+        <EditText
+            android:id="@+id/etIDUsuario"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Número de identificación" />
+
+        <EditText
+            android:id="@+id/etPasswordUsuario"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Contraseña"
+            android:inputType="textPassword"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Crear cuenta"
+            android:backgroundTint="#FF8A63"
+            tools:layout_editor_absoluteX="160dp"
+            tools:layout_editor_absoluteY="390dp" />
+
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
