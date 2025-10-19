@@ -22,12 +22,13 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.Logger
 
 class UsersListActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityUsersListBinding
     private lateinit var auth: FirebaseAuth
-    private val database = FirebaseDatabase.getInstance().reference
+    private val database = FirebaseDatabase.getInstance("https://trabajo-en-clase-57464-default-rtdb.firebaseio.com").reference
     private val usersList = mutableListOf<User>()
     private lateinit var adapter: UserListAdapter
     private var usersListener: ValueEventListener? = null
@@ -46,6 +47,14 @@ class UsersListActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         auth = FirebaseAuth.getInstance()
+        
+        try {
+            val fbDatabase = FirebaseDatabase.getInstance("https://trabajo-en-clase-57464-default-rtdb.firebaseio.com")
+            fbDatabase.setLogLevel(Logger.Level.DEBUG)
+            android.util.Log.d("UsersListActivity", "✅ Firebase Database inicializado")
+        } catch (e: Exception) {
+            android.util.Log.e("UsersListActivity", "❌ Error inicializando Firebase: ${e.message}")
+        }
 
         adapter = UserListAdapter(usersList)
         binding.listViewUsers.adapter = adapter
@@ -65,38 +74,101 @@ class UsersListActivity : AppCompatActivity() {
     }
 
     private fun loadUsers() {
-        val currentUserId = auth.currentUser?.uid ?: return
+        val currentUserId = auth.currentUser?.uid
+        
+        if (currentUserId == null) {
+            android.util.Log.e("UsersListActivity", "❌ ERROR: Usuario no autenticado")
+            Toast.makeText(this, "Error: No estás autenticado", Toast.LENGTH_LONG).show()
+            return
+        }
+        
+        android.util.Log.d("UsersListActivity", "📡 Conectando a Firebase...")
+        android.util.Log.d("UsersListActivity", "👤 Usuario actual: $currentUserId")
+
+        if (usersListener != null) {
+            database.child("users").removeEventListener(usersListener!!)
+        }
 
         usersListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                usersList.clear()
-                android.util.Log.d("UsersListActivity", "Total usuarios en Firebase: ${snapshot.childrenCount}")
+                android.util.Log.d("UsersListActivity", "🔄 onDataChange llamado")
+                android.util.Log.d("UsersListActivity", "📊 Total usuarios en Firebase: ${snapshot.childrenCount}")
                 
+                usersList.clear()
+                
+                if (!snapshot.exists()) {
+                    android.util.Log.w("UsersListActivity", "⚠️ No existe el nodo /users en Firebase")
+                    Toast.makeText(this@UsersListActivity, "No hay usuarios en la base de datos", Toast.LENGTH_LONG).show()
+                    return
+                }
+                
+                var contadorProcesados = 0
                 for (userSnapshot in snapshot.children) {
-                    val user = userSnapshot.getValue(User::class.java)
-                    android.util.Log.d("UsersListActivity", "Usuario encontrado: ${user?.firstName} ${user?.lastName}, Status: ${user?.status}, UID: ${user?.uid}")
+                    contadorProcesados++
+                    val userId = userSnapshot.key
+                    android.util.Log.d("UsersListActivity", "--- Usuario $contadorProcesados ---")
+                    android.util.Log.d("UsersListActivity", "  Key: $userId")
                     
-                    if (user != null && user.uid != currentUserId) {
+                    try {
+                        val user = userSnapshot.getValue(User::class.java)
+                        if (user == null) {
+                            android.util.Log.e("UsersListActivity", "  ❌ Error: Usuario null después de getValue")
+                            continue
+                        }
+                        
+                        android.util.Log.d("UsersListActivity", "  Nombre: ${user.firstName} ${user.lastName}")
+                        android.util.Log.d("UsersListActivity", "  Email: ${user.email}")
+                        android.util.Log.d("UsersListActivity", "  Status: ${user.status}")
+                        android.util.Log.d("UsersListActivity", "  UID: ${user.uid}")
+                        
+                        if (user.uid == currentUserId) {
+                            android.util.Log.d("UsersListActivity", "  ⏭️ Saltando: Es el usuario actual")
+                            continue
+                        }
+                        
                         usersList.add(user)
-                        android.util.Log.d("UsersListActivity", "Usuario agregado a la lista: ${user.firstName} ${user.lastName}")
+                        android.util.Log.d("UsersListActivity", "  ✅ Usuario agregado a la lista")
+                        
+                    } catch (e: Exception) {
+                        android.util.Log.e("UsersListActivity", "  ❌ Excepción al procesar usuario: ${e.message}")
+                        e.printStackTrace()
                     }
                 }
+                
+                android.util.Log.d("UsersListActivity", "=============================")
+                android.util.Log.d("UsersListActivity", "📋 Total usuarios procesados: $contadorProcesados")
+                android.util.Log.d("UsersListActivity", "📝 Total usuarios en lista: ${usersList.size}")
+                android.util.Log.d("UsersListActivity", "=============================")
+                
                 adapter.notifyDataSetChanged()
 
-                android.util.Log.d("UsersListActivity", "Total usuarios en lista: ${usersList.size}")
                 if (usersList.isEmpty()) {
-                    Toast.makeText(this@UsersListActivity, "No hay otros usuarios registrados", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@UsersListActivity, "⚠️ No hay otros usuarios además de ti", Toast.LENGTH_LONG).show()
                 } else {
-                    Toast.makeText(this@UsersListActivity, "${usersList.size} usuario(s) encontrado(s)", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@UsersListActivity, "✅ ${usersList.size} usuario(s) encontrado(s)", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
-                android.util.Log.e("UsersListActivity", "Error al cargar usuarios: ${error.message}")
-                Toast.makeText(this@UsersListActivity, "Error al cargar usuarios: ${error.message}", Toast.LENGTH_LONG).show()
+                android.util.Log.e("UsersListActivity", "❌ ERROR en Firebase: ${error.message}")
+                android.util.Log.e("UsersListActivity", "❌ Código de error: ${error.code}")
+                android.util.Log.e("UsersListActivity", "❌ Detalles: ${error.details}")
+                Toast.makeText(this@UsersListActivity, "Error de Firebase: ${error.message}", Toast.LENGTH_LONG).show()
             }
         }
+        
         database.child("users").addValueEventListener(usersListener!!)
+        android.util.Log.d("UsersListActivity", "✅ Listener agregado a Firebase")
+        
+        database.child("users").get().addOnSuccessListener { snapshot ->
+            android.util.Log.d("UsersListActivity", "🔍 TEST DIRECTO: ${snapshot.childrenCount} usuarios encontrados")
+            android.util.Log.d("UsersListActivity", "🔍 Existe el nodo: ${snapshot.exists()}")
+            for (child in snapshot.children) {
+                android.util.Log.d("UsersListActivity", "🔍 Usuario key: ${child.key}")
+            }
+        }.addOnFailureListener { error ->
+            android.util.Log.e("UsersListActivity", "🔍 TEST DIRECTO FALLÓ: ${error.message}")
+        }
     }
 
     inner class UserListAdapter(private val users: List<User>) : ArrayAdapter<User>(

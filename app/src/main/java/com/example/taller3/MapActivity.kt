@@ -30,7 +30,7 @@ class MapActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMapBinding
     private val PERMISSION_REQUEST_LOCATION = 1001
     private lateinit var auth: FirebaseAuth
-    private val database = FirebaseDatabase.getInstance().reference
+    private val database = FirebaseDatabase.getInstance("https://trabajo-en-clase-57464-default-rtdb.firebaseio.com").reference
 
     private var userMarker: Marker? = null
     private var locationManager: LocationManager? = null
@@ -267,6 +267,12 @@ class MapActivity : AppCompatActivity() {
             "longitude" to longitude
         )
         database.child("users").child(currentUserId).updateChildren(updates)
+            .addOnSuccessListener {
+                android.util.Log.d("MapActivity", "✅ Ubicación actualizada en Firebase: $latitude, $longitude")
+            }
+            .addOnFailureListener { e ->
+                android.util.Log.e("MapActivity", "❌ Error actualizando ubicación: ${e.message}")
+            }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

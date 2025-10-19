@@ -9,7 +9,7 @@ import com.google.firebase.database.*
 
 class UserStatusService : Service() {
 
-    private val database = FirebaseDatabase.getInstance().reference
+    private val database = FirebaseDatabase.getInstance("https://trabajo-en-clase-57464-default-rtdb.firebaseio.com").reference
     private val auth = FirebaseAuth.getInstance()
     private var usersListener: ValueEventListener? = null
     private val userStatusMap = mutableMapOf<String, String>()

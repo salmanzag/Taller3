@@ -36,7 +36,7 @@ class RegisterActivity : AppCompatActivity() {
 
     private var imageUri: Uri? = null
     private lateinit var auth: FirebaseAuth
-    private val database = FirebaseDatabase.getInstance().reference
+    private val database = FirebaseDatabase.getInstance("https://trabajo-en-clase-57464-default-rtdb.firebaseio.com").reference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

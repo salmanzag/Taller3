@@ -30,7 +30,7 @@ class UserTrackingActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityUserTrackingBinding
     private lateinit var auth: FirebaseAuth
-    private val database = FirebaseDatabase.getInstance().reference
+    private val database = FirebaseDatabase.getInstance("https://trabajo-en-clase-57464-default-rtdb.firebaseio.com").reference
     
     private var trackedUserMarker: Marker? = null
     private var myMarker: Marker? = null
@@ -158,16 +158,28 @@ class UserTrackingActivity : AppCompatActivity() {
                 val lat = snapshot.child("latitude").getValue(Double::class.java)
                 val lon = snapshot.child("longitude").getValue(Double::class.java)
 
-                if (lat != null && lon != null) {
+                android.util.Log.d("UserTrackingActivity", "Usuario rastreado - Lat: $lat, Lon: $lon")
+
+                if (lat != null && lon != null && (lat != 0.0 || lon != 0.0)) {
                     trackedUserLocation = GeoPoint(lat, lon)
                     updateTrackedUserMarker(lat, lon)
                     updateDistance()
+                    android.util.Log.d("UserTrackingActivity", "✅ Ubicación del usuario actualizada")
                 } else {
-                    Toast.makeText(this@UserTrackingActivity, "Usuario sin ubicación disponible", Toast.LENGTH_SHORT).show()
+                    android.util.Log.w("UserTrackingActivity", "⚠️ Usuario sin ubicación GPS válida")
+                    Toast.makeText(
+                        this@UserTrackingActivity, 
+                        "⚠️ $userName no tiene ubicación GPS activa. Pídele que abra el mapa para activar su GPS.", 
+                        Toast.LENGTH_LONG
+                    ).show()
+                    
+                    binding.tvTrackedUserLocation.text = "Ubicación: GPS no disponible"
+                    binding.tvDistance.text = "Distancia: --"
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
+                android.util.Log.e("UserTrackingActivity", "Error al seguir usuario: ${error.message}")
                 Toast.makeText(this@UserTrackingActivity, "Error al seguir usuario: ${error.message}", Toast.LENGTH_LONG).show()
             }
         }
