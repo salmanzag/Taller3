@@ -29,7 +29,7 @@ class UserStatusService : Service() {
                     
                     if (userId == currentUserId) continue
 
-                    val name = userSnapshot.child("name").getValue(String::class.java) ?: "Usuario"
+                    val name = userSnapshot.child("firstName").getValue(String::class.java) ?: "Usuario"
                     val lastName = userSnapshot.child("lastName").getValue(String::class.java) ?: ""
                     val fullName = "$name $lastName".trim()
                     val newStatus = userSnapshot.child("status").getValue(String::class.java) ?: "disconnected"

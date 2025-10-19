@@ -57,6 +57,10 @@ class UsersListActivity : AppCompatActivity() {
             registerReceiver(statusChangeReceiver, filter)
         }
 
+        android.util.Log.d("UsersListActivity", "=== DIAGNÓSTICO ===")
+        android.util.Log.d("UsersListActivity", "Usuario actual: ${auth.currentUser?.uid}")
+        android.util.Log.d("UsersListActivity", "Email actual: ${auth.currentUser?.email}")
+
         loadUsers()
     }
 
@@ -66,20 +70,29 @@ class UsersListActivity : AppCompatActivity() {
         usersListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 usersList.clear()
+                android.util.Log.d("UsersListActivity", "Total usuarios en Firebase: ${snapshot.childrenCount}")
+                
                 for (userSnapshot in snapshot.children) {
                     val user = userSnapshot.getValue(User::class.java)
-                    if (user != null && user.uid != currentUserId && user.status == "connected") {
+                    android.util.Log.d("UsersListActivity", "Usuario encontrado: ${user?.firstName} ${user?.lastName}, Status: ${user?.status}, UID: ${user?.uid}")
+                    
+                    if (user != null && user.uid != currentUserId) {
                         usersList.add(user)
+                        android.util.Log.d("UsersListActivity", "Usuario agregado a la lista: ${user.firstName} ${user.lastName}")
                     }
                 }
                 adapter.notifyDataSetChanged()
 
+                android.util.Log.d("UsersListActivity", "Total usuarios en lista: ${usersList.size}")
                 if (usersList.isEmpty()) {
-                    Toast.makeText(this@UsersListActivity, "No hay usuarios disponibles en este momento", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@UsersListActivity, "No hay otros usuarios registrados", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this@UsersListActivity, "${usersList.size} usuario(s) encontrado(s)", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
+                android.util.Log.e("UsersListActivity", "Error al cargar usuarios: ${error.message}")
                 Toast.makeText(this@UsersListActivity, "Error al cargar usuarios: ${error.message}", Toast.LENGTH_LONG).show()
             }
         }
