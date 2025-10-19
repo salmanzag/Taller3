@@ -1,77 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".register_activity">
+    tools:context=".RegisterActivity">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="16dp"
-        tools:layout_editor_absoluteX="128dp"
-        tools:layout_editor_absoluteY="45dp">
+        android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/imgPerfil"
-            android:layout_width="110dp"
-            android:layout_height="110dp"/>
-            <!--> Poner la foto de perfil<-->
-
-        <Button
-            android:id="@+id/buttonElegirImagen"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Seleccionar imagen"
-            android:backgroundTint="#FF5722"
-            tools:layout_editor_absoluteX="160dp"
-            tools:layout_editor_absoluteY="390dp"/>
-
-
-        <EditText
-            android:id="@+id/etNombreUsuario"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Nombre" />
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="16dp">
 
-        <EditText
-            android:id="@+id/etApellidoUsuario"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Apellido" />
+            <ImageView
+                android:id="@+id/imgPerfil"
+                android:layout_width="140dp"
+                android:layout_height="140dp"
+                android:src="@mipmap/ic_launcher"
+                android:layout_marginBottom="12dp" />
 
-        <EditText
-            android:id="@+id/etCorreoUsuario"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Correo electronico" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
 
-        <EditText
-            android:id="@+id/etIDUsuario"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Número de identificación" />
+                <Button
+                    android:id="@+id/buttonTomarFoto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tomar foto"
+                    android:backgroundTint="#FF5722"
+                    android:layout_marginEnd="8dp" />
 
-        <EditText
-            android:id="@+id/etPasswordUsuario"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Contraseña"
-            android:inputType="textPassword"/>
+                <Button
+                    android:id="@+id/buttonGaleria"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Galería"
+                    android:backgroundTint="#FF9800" />
+            </LinearLayout>
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Crear cuenta"
-            android:backgroundTint="#FF8A63"
-            tools:layout_editor_absoluteX="160dp"
-            tools:layout_editor_absoluteY="390dp" />
+            <EditText
+                android:id="@+id/etNombreUsuario"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Nombre" />
 
+            <EditText
+                android:id="@+id/etApellidoUsuario"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Apellido" />
 
-    </LinearLayout>
+            <EditText
+                android:id="@+id/etCorreoUsuario"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Correo electrónico"
+                android:inputType="textEmailAddress" />
 
+            <EditText
+                android:id="@+id/etIDUsuario"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Número de identificación" />
+
+            <EditText
+                android:id="@+id/etPasswordUsuario"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Contraseña"
+                android:inputType="textPassword" />
+
+            <Button
+                android:id="@+id/buttonCrearCuentaRegister"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Crear cuenta"
+                android:backgroundTint="#FF8A63"
+                android:layout_marginTop="20dp" />
+        </LinearLayout>
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

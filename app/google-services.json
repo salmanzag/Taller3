@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "731897178991",
+    "project_id": "trabajo-en-clase-57464",
+    "storage_bucket": "trabajo-en-clase-57464.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:731897178991:android:cb09b21bc40e8f5016d69a",
+        "android_client_info": {
+          "package_name": "com.example.aplicacionbase"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZHI-nCndzUqfEnKTwpngZzR2NUyvPW44"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:731897178991:android:ae0ea37960cf376b16d69a",
+        "android_client_info": {
+          "package_name": "com.example.taller3"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZHI-nCndzUqfEnKTwpngZzR2NUyvPW44"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
