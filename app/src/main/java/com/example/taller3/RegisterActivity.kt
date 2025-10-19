@@ -22,7 +22,6 @@ import com.example.taller3.databinding.ActivityRegisterBinding
 import com.example.taller3.model.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.storage.FirebaseStorage
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -38,7 +37,6 @@ class RegisterActivity : AppCompatActivity() {
     private var imageUri: Uri? = null
     private lateinit var auth: FirebaseAuth
     private val database = FirebaseDatabase.getInstance().reference
-    private val storage = FirebaseStorage.getInstance().reference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,8 +52,17 @@ class RegisterActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
 
-        binding.buttonTomarFoto.setOnClickListener { openCamera() }
-        binding.buttonGaleria.setOnClickListener { openGallery() }
+        binding.buttonTomarFoto.isEnabled = false
+        binding.buttonGaleria.isEnabled = false
+        binding.buttonTomarFoto.alpha = 0.5f
+        binding.buttonGaleria.alpha = 0.5f
+        
+        binding.buttonTomarFoto.setOnClickListener { 
+            Toast.makeText(this, "Fotos deshabilitadas: Firebase Storage no configurado", Toast.LENGTH_LONG).show()
+        }
+        binding.buttonGaleria.setOnClickListener { 
+            Toast.makeText(this, "Fotos deshabilitadas: Firebase Storage no configurado", Toast.LENGTH_LONG).show()
+        }
         binding.buttonCrearCuentaRegister.setOnClickListener { createAccount() }
     }
 
@@ -190,24 +197,9 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun uploadImageAndSaveUser(uid: String, firstName: String, lastName: String, email: String, idNumber: String) {
-        if (imageUri != null) {
-            val ref = storage.child("profiles/$uid.jpg")
-            ref.putFile(imageUri!!)
-                .addOnSuccessListener {
-                    ref.downloadUrl.addOnSuccessListener { uri ->
-                        saveUser(uid, firstName, lastName, email, idNumber, uri.toString())
-                    }.addOnFailureListener { 
-                        binding.buttonCrearCuentaRegister.isEnabled = true
-                        Toast.makeText(this, "Error obteniendo URL de imagen: ${it.message}", Toast.LENGTH_LONG).show()
-                    }
-                }
-                .addOnFailureListener {
-                    binding.buttonCrearCuentaRegister.isEnabled = true
-                    Toast.makeText(this, "Error subiendo imagen: ${it.message}", Toast.LENGTH_LONG).show()
-                }
-        } else {
-            saveUser(uid, firstName, lastName, email, idNumber, "")
-        }
+        android.util.Log.d("RegisterActivity", "Guardando usuario SIN Firebase Storage (Storage deshabilitado)")
+        Toast.makeText(this, "Nota: Las fotos están deshabilitadas (Firebase Storage no configurado)", Toast.LENGTH_SHORT).show()
+        saveUser(uid, firstName, lastName, email, idNumber, "")
     }
 
     private fun saveUser(uid: String, firstName: String, lastName: String, email: String, idNumber: String, photoUrl: String) {
