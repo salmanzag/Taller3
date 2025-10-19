@@ -135,6 +135,11 @@ class UsersListActivity : AppCompatActivity() {
                             continue
                         }
                         
+                        if (user.status != "connected" && user.status != "available") {
+                            android.util.Log.d("UsersListActivity", "  ⏭️ Saltando: Usuario no disponible (${user.status})")
+                            continue
+                        }
+                        
                         usersList.add(user)
                         android.util.Log.d("UsersListActivity", "  ✅ Usuario agregado a la lista")
                         
@@ -152,9 +157,9 @@ class UsersListActivity : AppCompatActivity() {
                 adapter.notifyDataSetChanged()
 
                 if (usersList.isEmpty()) {
-                    Toast.makeText(this@UsersListActivity, "⚠️ No hay otros usuarios además de ti", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@UsersListActivity, "⚠️ No hay usuarios disponibles en este momento", Toast.LENGTH_LONG).show()
                 } else {
-                    Toast.makeText(this@UsersListActivity, "✅ ${usersList.size} usuario(s) encontrado(s)", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@UsersListActivity, "✅ ${usersList.size} usuario(s) disponible(s)", Toast.LENGTH_SHORT).show()
                 }
             }
 

@@ -54,11 +54,26 @@ class MainActivity : AppCompatActivity() {
 
             auth.signInWithEmailAndPassword(email, password)
                 .addOnSuccessListener {
+                    Toast.makeText(this, "✅ Inicio de sesión exitoso", Toast.LENGTH_SHORT).show()
                     startActivity(Intent(this, MapActivity::class.java))
                     finish()
                 }
-                .addOnFailureListener { ex ->
-                    Toast.makeText(this, "Error al iniciar sesión: ${ex.message}", Toast.LENGTH_LONG).show()
+                .addOnFailureListener { exception ->
+                    val errorMessage = when {
+                        exception.message?.contains("password") == true || 
+                        exception.message?.contains("INVALID_LOGIN_CREDENTIALS") == true -> 
+                            "❌ Contraseña incorrecta"
+                        exception.message?.contains("no user record") == true || 
+                        exception.message?.contains("user-not-found") == true -> 
+                            "❌ Usuario no registrado"
+                        exception.message?.contains("email") == true -> 
+                            "❌ Email inválido"
+                        exception.message?.contains("network") == true -> 
+                            "❌ Error de conexión"
+                        else -> 
+                            "❌ Datos inválidos: Verifica tu email y contraseña"
+                    }
+                    Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
                 }
         }
     }

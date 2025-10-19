@@ -22,6 +22,7 @@ import com.example.taller3.databinding.ActivityRegisterBinding
 import com.example.taller3.model.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.storage.FirebaseStorage
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -37,6 +38,7 @@ class RegisterActivity : AppCompatActivity() {
     private var imageUri: Uri? = null
     private lateinit var auth: FirebaseAuth
     private val database = FirebaseDatabase.getInstance("https://trabajo-en-clase-57464-default-rtdb.firebaseio.com").reference
+    private val storage = FirebaseStorage.getInstance().reference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,30 +54,37 @@ class RegisterActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
 
-        binding.buttonTomarFoto.isEnabled = false
-        binding.buttonGaleria.isEnabled = false
-        binding.buttonTomarFoto.alpha = 0.5f
-        binding.buttonGaleria.alpha = 0.5f
-        
         binding.buttonTomarFoto.setOnClickListener { 
-            Toast.makeText(this, "Fotos deshabilitadas: Firebase Storage no configurado", Toast.LENGTH_LONG).show()
+            android.util.Log.d("RegisterActivity", "📸 Botón Tomar Foto presionado")
+            takePhoto() 
         }
         binding.buttonGaleria.setOnClickListener { 
-            Toast.makeText(this, "Fotos deshabilitadas: Firebase Storage no configurado", Toast.LENGTH_LONG).show()
+            android.util.Log.d("RegisterActivity", "🖼️ Botón Galería presionado")
+            openGallery() 
         }
         binding.buttonCrearCuentaRegister.setOnClickListener { createAccount() }
     }
+    
+    private fun takePhoto() {
+        android.util.Log.d("RegisterActivity", "Iniciando openCamera()")
+        openCamera()
+    }
 
     private fun openGallery() {
+        android.util.Log.d("RegisterActivity", "Iniciando openGallery()")
         val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             Manifest.permission.READ_MEDIA_IMAGES
         } else {
             Manifest.permission.READ_EXTERNAL_STORAGE
         }
         
+        android.util.Log.d("RegisterActivity", "Permiso necesario: $permission")
+        
         if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+            android.util.Log.d("RegisterActivity", "Solicitando permiso de galería")
             requestPermissions(arrayOf(permission), REQUEST_GALLERY)
         } else {
+            android.util.Log.d("RegisterActivity", "Permiso ya otorgado, abriendo galería")
             openGalleryIntent()
         }
     }
@@ -87,9 +96,12 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun openCamera() {
+        android.util.Log.d("RegisterActivity", "Verificando permiso de cámara")
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            android.util.Log.d("RegisterActivity", "Solicitando permiso de cámara")
             requestPermissions(arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA)
         } else {
+            android.util.Log.d("RegisterActivity", "Permiso de cámara ya otorgado, abriendo cámara")
             openCameraIntent()
         }
     }
@@ -122,19 +134,27 @@ class RegisterActivity : AppCompatActivity() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         
+        android.util.Log.d("RegisterActivity", "onRequestPermissionsResult - requestCode: $requestCode")
+        
         when (requestCode) {
             REQUEST_CAMERA -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    android.util.Log.d("RegisterActivity", "✅ Permiso de cámara otorgado")
+                    Toast.makeText(this, "✅ Permiso otorgado, abriendo cámara", Toast.LENGTH_SHORT).show()
                     openCameraIntent()
                 } else {
-                    Toast.makeText(this, "Permiso de cámara denegado", Toast.LENGTH_SHORT).show()
+                    android.util.Log.w("RegisterActivity", "❌ Permiso de cámara denegado")
+                    Toast.makeText(this, "❌ Permiso de cámara denegado", Toast.LENGTH_LONG).show()
                 }
             }
             REQUEST_GALLERY -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    android.util.Log.d("RegisterActivity", "✅ Permiso de galería otorgado")
+                    Toast.makeText(this, "✅ Permiso otorgado, abriendo galería", Toast.LENGTH_SHORT).show()
                     openGalleryIntent()
                 } else {
-                    Toast.makeText(this, "Permiso de galería denegado", Toast.LENGTH_SHORT).show()
+                    android.util.Log.w("RegisterActivity", "❌ Permiso de galería denegado")
+                    Toast.makeText(this, "❌ Permiso de galería denegado", Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -143,14 +163,24 @@ class RegisterActivity : AppCompatActivity() {
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode != Activity.RESULT_OK) return
+        
+        android.util.Log.d("RegisterActivity", "onActivityResult - requestCode: $requestCode, resultCode: $resultCode")
+        
+        if (resultCode != Activity.RESULT_OK) {
+            android.util.Log.w("RegisterActivity", "Resultado no OK, usuario canceló")
+            return
+        }
 
         when (requestCode) {
             REQUEST_GALLERY -> {
                 imageUri = data?.data
+                android.util.Log.d("RegisterActivity", "✅ Imagen seleccionada de galería: $imageUri")
+                Toast.makeText(this, "✅ Foto seleccionada", Toast.LENGTH_SHORT).show()
                 Glide.with(this).load(imageUri).centerCrop().into(binding.imgPerfil)
             }
             REQUEST_CAMERA -> {
+                android.util.Log.d("RegisterActivity", "✅ Foto tomada: $imageUri")
+                Toast.makeText(this, "✅ Foto tomada", Toast.LENGTH_SHORT).show()
                 imageUri?.let { Glide.with(this).load(it).centerCrop().into(binding.imgPerfil) }
             }
         }
@@ -185,21 +215,47 @@ class RegisterActivity : AppCompatActivity() {
                 val uid = result.user?.uid
                 if (uid == null) {
                     binding.buttonCrearCuentaRegister.isEnabled = true
-                    Toast.makeText(this, "Error: No se pudo obtener el UID del usuario", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "❌ Error: No se pudo obtener el UID del usuario", Toast.LENGTH_LONG).show()
                     return@addOnSuccessListener
                 }
                 uploadImageAndSaveUser(uid, firstName, lastName, email, idNumber)
             }
-            .addOnFailureListener {
+            .addOnFailureListener { exception ->
                 binding.buttonCrearCuentaRegister.isEnabled = true
-                Toast.makeText(this, "Error al crear cuenta: ${it.message}", Toast.LENGTH_LONG).show()
+                val errorMessage = when {
+                    exception.message?.contains("password") == true -> "❌ Contraseña incorrecta o muy débil"
+                    exception.message?.contains("email") == true -> "❌ Email ya registrado o inválido"
+                    exception.message?.contains("network") == true -> "❌ Error de conexión"
+                    else -> "❌ Datos inválidos: ${exception.message}"
+                }
+                Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
             }
     }
 
     private fun uploadImageAndSaveUser(uid: String, firstName: String, lastName: String, email: String, idNumber: String) {
-        android.util.Log.d("RegisterActivity", "Guardando usuario SIN Firebase Storage (Storage deshabilitado)")
-        Toast.makeText(this, "Nota: Las fotos están deshabilitadas (Firebase Storage no configurado)", Toast.LENGTH_SHORT).show()
-        saveUser(uid, firstName, lastName, email, idNumber, "")
+        if (imageUri == null) {
+            android.util.Log.d("RegisterActivity", "No hay imagen, guardando usuario sin foto")
+            saveUser(uid, firstName, lastName, email, idNumber, "")
+            return
+        }
+
+        val imageRef = storage.child("profile_images/$uid.jpg")
+        android.util.Log.d("RegisterActivity", "Subiendo imagen a Firebase Storage...")
+        
+        imageRef.putFile(imageUri!!)
+            .addOnSuccessListener { taskSnapshot ->
+                android.util.Log.d("RegisterActivity", "✅ Imagen subida correctamente")
+                imageRef.downloadUrl.addOnSuccessListener { uri ->
+                    val photoUrl = uri.toString()
+                    android.util.Log.d("RegisterActivity", "✅ URL de imagen obtenida: $photoUrl")
+                    saveUser(uid, firstName, lastName, email, idNumber, photoUrl)
+                }
+            }
+            .addOnFailureListener { error ->
+                android.util.Log.e("RegisterActivity", "❌ Error subiendo imagen: ${error.message}")
+                Toast.makeText(this, "⚠️ Error subiendo foto, guardando sin imagen", Toast.LENGTH_SHORT).show()
+                saveUser(uid, firstName, lastName, email, idNumber, "")
+            }
     }
 
     private fun saveUser(uid: String, firstName: String, lastName: String, email: String, idNumber: String, photoUrl: String) {
@@ -227,8 +283,11 @@ class RegisterActivity : AppCompatActivity() {
         database.child("users").child(uid).setValue(user)
             .addOnSuccessListener {
                 binding.buttonCrearCuentaRegister.isEnabled = true
-                auth.signOut()
-                Toast.makeText(this, "Cuenta creada correctamente. Inicia sesión.", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "✅ Cuenta creada correctamente", Toast.LENGTH_LONG).show()
+                
+                val intent = Intent(this, MapActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
                 finish()
             }
             .addOnFailureListener { error ->
@@ -236,7 +295,7 @@ class RegisterActivity : AppCompatActivity() {
                 auth.currentUser?.delete()?.addOnCompleteListener {
                     auth.signOut()
                 }
-                Toast.makeText(this, "Error guardando usuario: ${error.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "❌ Error guardando usuario: ${error.message}", Toast.LENGTH_LONG).show()
             }
     }
 }
