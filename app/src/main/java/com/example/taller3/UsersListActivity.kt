@@ -110,10 +110,19 @@ class UsersListActivity : AppCompatActivity() {
                     android.util.Log.d("UsersListActivity", "  Key: $userId")
                     
                     try {
-                        val user = userSnapshot.getValue(User::class.java)
+                        var user = userSnapshot.getValue(User::class.java)
                         if (user == null) {
                             android.util.Log.e("UsersListActivity", "  ❌ Error: Usuario null después de getValue")
                             continue
+                        }
+                        
+                        if (user.uid.isEmpty() && userId != null) {
+                            user = user.copy(uid = userId)
+                            android.util.Log.d("UsersListActivity", "  🔧 UID corregido desde key: $userId")
+                        }
+                        
+                        if (user.firstName.isEmpty() && user.lastName.isEmpty()) {
+                            android.util.Log.w("UsersListActivity", "  ⚠️ Usuario sin nombre, usando UID: ${user.uid}")
                         }
                         
                         android.util.Log.d("UsersListActivity", "  Nombre: ${user.firstName} ${user.lastName}")
@@ -186,7 +195,13 @@ class UsersListActivity : AppCompatActivity() {
             val tvStatus = view.findViewById<TextView>(R.id.tvUserStatus)
             val btnVer = view.findViewById<Button>(R.id.btnVerUbicacion)
             
-            tvName.text = "${user.firstName} ${user.lastName}"
+            val displayName = if (user.firstName.isNotEmpty() || user.lastName.isNotEmpty()) {
+                "${user.firstName} ${user.lastName}".trim()
+            } else {
+                "Usuario ${user.uid.take(8)}"
+            }
+            
+            tvName.text = displayName
             tvStatus.text = if (user.status == "connected") "Conectado" else "Desconectado"
             
             if (user.photoUrl.isNotEmpty()) {

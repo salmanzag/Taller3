@@ -21,6 +21,7 @@ import com.google.firebase.database.ValueEventListener
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.Polyline
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
@@ -34,6 +35,7 @@ class UserTrackingActivity : AppCompatActivity() {
     
     private var trackedUserMarker: Marker? = null
     private var myMarker: Marker? = null
+    private var distanceLine: Polyline? = null
     private var locationManager: LocationManager? = null
     private var userLocationListener: ValueEventListener? = null
     
@@ -148,7 +150,7 @@ class UserTrackingActivity : AppCompatActivity() {
             myMarker?.position = geo
             binding.mapTracking.invalidate()
             
-            updateDistance()
+            updateDistanceAndLine()
         }
     }
 
@@ -163,7 +165,7 @@ class UserTrackingActivity : AppCompatActivity() {
                 if (lat != null && lon != null && (lat != 0.0 || lon != 0.0)) {
                     trackedUserLocation = GeoPoint(lat, lon)
                     updateTrackedUserMarker(lat, lon)
-                    updateDistance()
+                    updateDistanceAndLine()
                     android.util.Log.d("UserTrackingActivity", "✅ Ubicación del usuario actualizada")
                 } else {
                     android.util.Log.w("UserTrackingActivity", "⚠️ Usuario sin ubicación GPS válida")
@@ -205,7 +207,7 @@ class UserTrackingActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateDistance() {
+    private fun updateDistanceAndLine() {
         if (myLocation != null && trackedUserLocation != null) {
             val distance = calculateDistance(
                 myLocation!!.latitude,
@@ -216,6 +218,20 @@ class UserTrackingActivity : AppCompatActivity() {
             
             runOnUiThread {
                 binding.tvDistance.text = "Distancia: ${"%.2f".format(distance)} km"
+                
+                if (distanceLine != null) {
+                    binding.mapTracking.overlays.remove(distanceLine)
+                }
+                
+                distanceLine = Polyline().apply {
+                    addPoint(GeoPoint(myLocation!!.latitude, myLocation!!.longitude))
+                    addPoint(trackedUserLocation)
+                    outlinePaint.color = android.graphics.Color.BLUE
+                    outlinePaint.strokeWidth = 8f
+                }
+                
+                binding.mapTracking.overlays.add(distanceLine)
+                binding.mapTracking.invalidate()
             }
         }
     }
@@ -271,6 +287,11 @@ class UserTrackingActivity : AppCompatActivity() {
                 database.child("users").child(userId).removeEventListener(it)
             }
             userLocationListener = null
+            
+            if (distanceLine != null) {
+                binding.mapTracking.overlays.remove(distanceLine)
+                distanceLine = null
+            }
             
             myMarker = null
             trackedUserMarker = null
