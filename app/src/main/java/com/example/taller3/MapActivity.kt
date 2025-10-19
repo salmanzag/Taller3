@@ -268,10 +268,10 @@ class MapActivity : AppCompatActivity() {
         )
         database.child("users").child(currentUserId).updateChildren(updates)
             .addOnSuccessListener {
-                android.util.Log.d("MapActivity", "✅ Ubicación actualizada en Firebase: $latitude, $longitude")
+                android.util.Log.d("MapActivity", " Ubicación actualizada en Firebase: $latitude, $longitude")
             }
             .addOnFailureListener { e ->
-                android.util.Log.e("MapActivity", "❌ Error actualizando ubicación: ${e.message}")
+                android.util.Log.e("MapActivity", " Error actualizando ubicación: ${e.message}")
             }
     }
 

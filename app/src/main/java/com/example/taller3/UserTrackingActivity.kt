@@ -166,12 +166,12 @@ class UserTrackingActivity : AppCompatActivity() {
                     trackedUserLocation = GeoPoint(lat, lon)
                     updateTrackedUserMarker(lat, lon)
                     updateDistanceAndLine()
-                    android.util.Log.d("UserTrackingActivity", "✅ Ubicación del usuario actualizada")
+                    android.util.Log.d("UserTrackingActivity", "Ubicación del usuario actualizada")
                 } else {
-                    android.util.Log.w("UserTrackingActivity", "⚠️ Usuario sin ubicación GPS válida")
+                    android.util.Log.w("UserTrackingActivity", "Usuario sin ubicación GPS válida")
                     Toast.makeText(
                         this@UserTrackingActivity, 
-                        "⚠️ $userName no tiene ubicación GPS activa. Pídele que abra el mapa para activar su GPS.", 
+                        " $userName no tiene ubicación GPS activa. Pídele que abra el mapa para activar su GPS.",
                         Toast.LENGTH_LONG
                     ).show()
                     

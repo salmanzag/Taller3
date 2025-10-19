@@ -16,7 +16,7 @@ class UserStatusService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        android.util.Log.d("UserStatusService", "✅ Servicio iniciado")
+        android.util.Log.d("UserStatusService", " Servicio iniciado")
         startListeningToUsers()
     }
 
@@ -24,15 +24,15 @@ class UserStatusService : Service() {
         val currentUserId = auth.currentUser?.uid
         
         if (currentUserId == null) {
-            android.util.Log.w("UserStatusService", "⚠️ No hay usuario autenticado")
+            android.util.Log.w("UserStatusService", " No hay usuario autenticado")
             return
         }
 
-        android.util.Log.d("UserStatusService", "👂 Escuchando cambios de estado de usuarios")
+        android.util.Log.d("UserStatusService", " Escuchando cambios de estado de usuarios")
 
         usersListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                android.util.Log.d("UserStatusService", "🔄 Cambio detectado en usuarios")
+                android.util.Log.d("UserStatusService", " Cambio detectado en usuarios")
                 
                 for (userSnapshot in snapshot.children) {
                     val userId = userSnapshot.key ?: continue
@@ -51,17 +51,17 @@ class UserStatusService : Service() {
                     val previousStatus = userStatusMap[userId]
                     
                     if (previousStatus != null && previousStatus != newStatus) {
-                        android.util.Log.d("UserStatusService", "📊 $fullName: $previousStatus → $newStatus")
+                        android.util.Log.d("UserStatusService", " $fullName: $previousStatus → $newStatus")
                         
                         when (newStatus) {
                             "connected", "available" -> {
-                                val message = "✅ $fullName está disponible"
+                                val message = " $fullName está disponible"
                                 android.util.Log.i("UserStatusService", message)
                                 showToast(message)
                                 sendStatusChangeBroadcast()
                             }
                             "disconnected" -> {
-                                val message = "❌ $fullName se desconectó"
+                                val message = " $fullName se desconectó"
                                 android.util.Log.i("UserStatusService", message)
                                 showToast(message)
                                 sendStatusChangeBroadcast()
@@ -74,7 +74,7 @@ class UserStatusService : Service() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                android.util.Log.e("UserStatusService", "❌ Error: ${error.message}")
+                android.util.Log.e("UserStatusService", "Error: ${error.message}")
             }
         }
 
@@ -88,12 +88,12 @@ class UserStatusService : Service() {
     private fun sendStatusChangeBroadcast() {
         val intent = Intent("com.example.taller3.USER_STATUS_CHANGED")
         sendBroadcast(intent)
-        android.util.Log.d("UserStatusService", "📡 Broadcast enviado: USER_STATUS_CHANGED")
+        android.util.Log.d("UserStatusService", " Broadcast enviado: USER_STATUS_CHANGED")
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        android.util.Log.d("UserStatusService", "🛑 Servicio detenido")
+        android.util.Log.d("UserStatusService", "Servicio detenido")
         usersListener?.let {
             database.child("users").removeEventListener(it)
         }
