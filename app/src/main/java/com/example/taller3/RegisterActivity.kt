@@ -122,18 +122,16 @@ class RegisterActivity : AppCompatActivity() {
         when (requestCode) {
             REQUEST_CAMERA -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this, "✅ Permiso otorgado, abriendo cámara", Toast.LENGTH_SHORT).show()
                     openCameraIntent()
                 } else {
-                    Toast.makeText(this, "❌ Permiso de cámara denegado", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "Permiso de cámara denegado", Toast.LENGTH_LONG).show()
                 }
             }
             REQUEST_GALLERY -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this, "✅ Permiso otorgado, abriendo galería", Toast.LENGTH_SHORT).show()
                     openGalleryIntent()
                 } else {
-                    Toast.makeText(this, "❌ Permiso de galería denegado", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "Permiso de galería denegado", Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -148,11 +146,9 @@ class RegisterActivity : AppCompatActivity() {
         when (requestCode) {
             REQUEST_GALLERY -> {
                 imageUri = data?.data
-                Toast.makeText(this, "✅ Foto seleccionada", Toast.LENGTH_SHORT).show()
                 Glide.with(this).load(imageUri).centerCrop().into(binding.imgPerfil)
             }
             REQUEST_CAMERA -> {
-                Toast.makeText(this, "✅ Foto tomada", Toast.LENGTH_SHORT).show()
                 imageUri?.let { Glide.with(this).load(it).centerCrop().into(binding.imgPerfil) }
             }
         }
@@ -187,7 +183,7 @@ class RegisterActivity : AppCompatActivity() {
                 val uid = result.user?.uid
                 if (uid == null) {
                     binding.buttonCrearCuentaRegister.isEnabled = true
-                    Toast.makeText(this, " Error: No se pudo obtener el UID del usuario", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "Error: No se pudo obtener el UID del usuario", Toast.LENGTH_LONG).show()
                     return@addOnSuccessListener
                 }
                 uploadImageAndSaveUser(uid, firstName, lastName, email, idNumber)
@@ -195,10 +191,10 @@ class RegisterActivity : AppCompatActivity() {
             .addOnFailureListener { exception ->
                 binding.buttonCrearCuentaRegister.isEnabled = true
                 val errorMessage = when {
-                    exception.message?.contains("password") == true -> " Contraseña incorrecta o muy débil"
-                    exception.message?.contains("email") == true -> " Email ya registrado o inválido"
-                    exception.message?.contains("network") == true -> " Error de conexión"
-                    else -> " Datos inválidos: ${exception.message}"
+                    exception.message?.contains("password") == true -> "Contraseña incorrecta o muy débil"
+                    exception.message?.contains("email") == true -> "Email ya registrado o inválido"
+                    exception.message?.contains("network") == true -> "Error de conexión"
+                    else -> "Datos inválidos: ${exception.message}"
                 }
                 Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
             }
@@ -220,7 +216,7 @@ class RegisterActivity : AppCompatActivity() {
                 }
             }
             .addOnFailureListener {
-                Toast.makeText(this, "⚠️ Error subiendo foto, guardando sin imagen", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Error subiendo foto, guardando sin imagen", Toast.LENGTH_SHORT).show()
                 saveUser(uid, firstName, lastName, email, idNumber, "")
             }
     }
@@ -249,7 +245,7 @@ class RegisterActivity : AppCompatActivity() {
         database.child("users").child(uid).setValue(user)
             .addOnSuccessListener {
                 binding.buttonCrearCuentaRegister.isEnabled = true
-                Toast.makeText(this, "✅ Cuenta creada correctamente", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Cuenta creada correctamente", Toast.LENGTH_LONG).show()
                 
                 val intent = Intent(this, MapActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -261,7 +257,7 @@ class RegisterActivity : AppCompatActivity() {
                 auth.currentUser?.delete()?.addOnCompleteListener {
                     auth.signOut()
                 }
-                Toast.makeText(this, "❌ Error guardando usuario: ${error.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Error guardando usuario: ${error.message}", Toast.LENGTH_LONG).show()
             }
     }
 }

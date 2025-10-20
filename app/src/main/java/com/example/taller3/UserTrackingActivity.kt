@@ -160,18 +160,14 @@ class UserTrackingActivity : AppCompatActivity() {
                 val lat = snapshot.child("latitude").getValue(Double::class.java)
                 val lon = snapshot.child("longitude").getValue(Double::class.java)
 
-                android.util.Log.d("UserTrackingActivity", "Usuario rastreado - Lat: $lat, Lon: $lon")
-
                 if (lat != null && lon != null && (lat != 0.0 || lon != 0.0)) {
                     trackedUserLocation = GeoPoint(lat, lon)
                     updateTrackedUserMarker(lat, lon)
                     updateDistanceAndLine()
-                    android.util.Log.d("UserTrackingActivity", "Ubicación del usuario actualizada")
                 } else {
-                    android.util.Log.w("UserTrackingActivity", "Usuario sin ubicación GPS válida")
                     Toast.makeText(
                         this@UserTrackingActivity, 
-                        " $userName no tiene ubicación GPS activa. Pídele que abra el mapa para activar su GPS.",
+                        "$userName no tiene ubicación GPS activa. Pídele que abra el mapa para activar su GPS.",
                         Toast.LENGTH_LONG
                     ).show()
                     
@@ -181,7 +177,6 @@ class UserTrackingActivity : AppCompatActivity() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                android.util.Log.e("UserTrackingActivity", "Error al seguir usuario: ${error.message}")
                 Toast.makeText(this@UserTrackingActivity, "Error al seguir usuario: ${error.message}", Toast.LENGTH_LONG).show()
             }
         }

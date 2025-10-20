@@ -43,11 +43,11 @@ class UserStatusService : Service() {
                     if (previousStatus != null && previousStatus != newStatus) {
                         when (newStatus) {
                             "connected", "available" -> {
-                                showToast("✅ $fullName está disponible")
+                                showToast("$fullName está disponible")
                                 sendStatusChangeBroadcast()
                             }
                             "disconnected" -> {
-                                showToast("❌ $fullName se desconectó")
+                                showToast("$fullName se desconectó")
                                 sendStatusChangeBroadcast()
                             }
                         }

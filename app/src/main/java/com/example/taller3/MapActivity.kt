@@ -64,7 +64,6 @@ class MapActivity : AppCompatActivity() {
         }
         
         binding.btnEstado.setOnClickListener {
-            android.util.Log.d("MapActivity", "Botón de estado presionado")
             toggleUserStatus()
         }
         
@@ -267,12 +266,6 @@ class MapActivity : AppCompatActivity() {
             "longitude" to longitude
         )
         database.child("users").child(currentUserId).updateChildren(updates)
-            .addOnSuccessListener {
-                android.util.Log.d("MapActivity", " Ubicación actualizada en Firebase: $latitude, $longitude")
-            }
-            .addOnFailureListener { e ->
-                android.util.Log.e("MapActivity", " Error actualizando ubicación: ${e.message}")
-            }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -306,7 +299,6 @@ class MapActivity : AppCompatActivity() {
         binding.btnEstado.isEnabled = false
         
         val newStatus = if (currentStatus == "connected") "disconnected" else "connected"
-        android.util.Log.d("MapActivity", "Alternando estado de '$currentStatus' a '$newStatus'")
         
         currentStatus = newStatus
         
@@ -323,23 +315,19 @@ class MapActivity : AppCompatActivity() {
             return
         }
         
-        android.util.Log.d("MapActivity", "Actualizando estado a: $status (currentStatus antes=$currentStatus)")
         database.child("users").child(currentUserId).child("status").setValue(status)
             .addOnSuccessListener {
                 currentStatus = status
                 val message = if (status == "connected") "Estado: Disponible" else "Estado: Desconectado"
-                android.util.Log.d("MapActivity", "Estado actualizado exitosamente a: $status (currentStatus ahora=$currentStatus)")
                 Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
                 
                 if (updateUI) {
                     updateStatusButton(status)
                 } else {
                     binding.btnEstado.isEnabled = true
-                    android.util.Log.d("MapActivity", "Botón habilitado después de actualizar Firebase")
                 }
             }
             .addOnFailureListener { e ->
-                android.util.Log.e("MapActivity", "Error al actualizar estado", e)
                 Toast.makeText(this, "Error al actualizar estado: ${e.message}", Toast.LENGTH_SHORT).show()
                 
                 val previousStatus = if (status == "connected") "disconnected" else "connected"
@@ -349,7 +337,6 @@ class MapActivity : AppCompatActivity() {
     }
     
     private fun updateStatusButton(status: String) {
-        android.util.Log.d("MapActivity", "Actualizando botón con estado: $status (currentStatus=$currentStatus)")
         if (status == "connected") {
             binding.btnEstado.text = "● Disponible"
             binding.btnEstado.setBackgroundColor(0xFF4CAF50.toInt())
@@ -358,7 +345,6 @@ class MapActivity : AppCompatActivity() {
             binding.btnEstado.setBackgroundColor(0xFFF44336.toInt())
         }
         binding.btnEstado.isEnabled = true
-        android.util.Log.d("MapActivity", "Botón actualizado y habilitado. Texto: ${binding.btnEstado.text}")
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
